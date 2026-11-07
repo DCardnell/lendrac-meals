@@ -1,0 +1,119 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model HouseholdSettings {
+  id                     String   @id @default("default")
+  activeSupermarkets     String   @default("[\"aldi\",\"lidl\",\"asda\",\"tesco\",\"sainsburys\",\"morrisons\",\"waitrose\",\"ocado\"]")
+  hasTescoClubcard       Boolean  @default(true)
+  hasSainsburysNectar    Boolean  @default(true)
+  hasMorrisonsMore       Boolean  @default(true)
+  hasLidlPlus            Boolean  @default(true)
+  splitShopMinSavingsGbp Float    @default(4.0)
+  currentDeckBatchSize   Int      @default(30)
+  currentDeckSeed        Int      @default(1)
+  updatedAt              DateTime @updatedAt
+}
+
+model HouseholdMember {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  color     String     @default("#00f3ff")
+  createdAt DateTime   @default(now())
+  votes     MealVote[]
+}
+
+model CanonicalProduct {
+  id           String           @id
+  name         String
+  aisle        String
+  defaultUnit  String
+  packSize     Float
+  packLabel    String
+  storePrices  String           // JSON map: { aldi: { base, loyalty? }, lidl: {...}, asda: {...}, tesco: {...}, sainsburys: {...}, morrisons: {...}, waitrose: {...}, ocado: {...} }
+  ingredients  MealIngredient[]
+  stapleItems  StapleItem[]
+  shoppingList ShoppingItem[]
+  updatedAt    DateTime         @updatedAt
+}
+
+model Meal {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  title          String
+  description    String
+  cuisine        String
+  category       String           // e.g. "Quick & Easy", "Fakeaway", "Comfort & Classics", "Slow Cooker & Traybake", "Healthy & Light", "Veggie & Plant"
+  prepMinutes    Int              @default(15)
+  cookMinutes    Int              @default(25)
+  servings       Int              @default(4)
+  emoji          String           @default("🍽️")
+  tags           String           @default("[]") // JSON string array
+  inCurrentDeck  Boolean          @default(false)
+  selectedForWeek Boolean         @default(false)
+  plannedDay     String?          // Optional: "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+  portionScale   Float            @default(1.0)
+  isCustom       Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  ingredients    MealIngredient[]
+  votes          MealVote[]
+}
+
+model MealIngredient {
+  id               String           @id @default(cuid())
+  mealId           String
+  meal             Meal             @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  productId        String
+  product          CanonicalProduct @relation(fields: [productId], references: [id])
+  quantity         Float            // Quantity in product's defaultUnit (e.g. grams, ml, or count)
+  displayQuantity  String           // Human friendly string e.g. "500g", "2 tins", "1 tbsp"
+  isPantry         Boolean          @default(false) // True for salt/pepper/oil/spices usually in cupboard
+}
+
+model MealVote {
+  id         String          @id @default(cuid())
+  mealId     String
+  meal       Meal            @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  memberId   String
+  member     HouseholdMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberName String
+  choice     String          // "YES" | "NOT_THIS_WEEK" | "NO"
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([mealId, memberId])
+}
+
+model StapleItem {
+  id             String            @id @default(cuid())
+  name           String            @unique
+  aisle          String
+  productId      String?
+  product        CanonicalProduct? @relation(fields: [productId], references: [id])
+  quantityPacks  Float             @default(1)
+  status         String            @default("NEEDED") // "OUT" | "LOW" | "IN_STOCK" | "NEEDED"
+  autoNeedWeekly Boolean           @default(true)
+  updatedAt      DateTime          @updatedAt
+}
+
+model ShoppingItem {
+  id             String            @id @default(cuid())
+  name           String
+  aisle          String
+  productId      String?
+  product        CanonicalProduct? @relation(fields: [productId], references: [id])
+  totalQuantity  Float             @default(1)
+  packsNeeded    Int               @default(1)
+  unitLabel      String            @default("1 pack")
+  sourceNotes    String            @default("") // e.g. "Spag Bol + Chilli Con Carne" or "Weekly Staple (Ran Out)"
+  sourceType     String            @default("MEAL") // "MEAL" | "STAPLE" | "MANUAL"
+  checked        Boolean           @default(false)
+  haveInCupboard Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}

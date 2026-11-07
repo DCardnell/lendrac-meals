@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg-space: #04060d;
+  --bg-panel: rgba(11, 17, 30, 0.85);
+  --bg-card: rgba(16, 24, 42, 0.92);
+  --bg-elevated: rgba(24, 36, 62, 0.95);
+
+  --neon-cyan: #00f3ff;
+  --neon-cyan-dim: rgba(0, 243, 255, 0.16);
+  --lcars-orange: #ff9d00;
+  --lcars-orange-dim: rgba(255, 157, 0, 0.18);
+  --neon-green: #00ff9d;
+  --neon-green-dim: rgba(0, 255, 157, 0.16);
+  --neon-pink: #ff2e93;
+  --neon-pink-dim: rgba(255, 46, 147, 0.16);
+  --neon-purple: #b829ff;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  --font-display: 'Orbitron', sans-serif;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-space);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(0, 243, 255, 0.07) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(255, 157, 0, 0.06) 0%, transparent 40%),
+    linear-gradient(rgba(0, 243, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 85px;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: 1.5px;
+}
+
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input, select, textarea {
+  font-family: var(--font-sans);
+  background: rgba(6, 10, 20, 0.85);
+  border: 1px solid var(--glass-border);
+  border-bottom: 2px solid var(--neon-cyan);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--lcars-orange);
+  box-shadow: 0 0 12px rgba(255, 157, 0, 0.25);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-space);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.25);
+  border-radius: 4px;
+}
