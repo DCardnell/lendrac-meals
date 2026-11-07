@@ -444,7 +444,7 @@ async function rebuildShoppingListInternal() {
     },
   })
 
-  for (const [, entry] of aggMap) {
+  for (const entry of Array.from(aggMap.values())) {
     const mealPacks =
       entry.totalQuantity > 0 && entry.packSize > 0
         ? Math.ceil(entry.totalQuantity / entry.packSize)
